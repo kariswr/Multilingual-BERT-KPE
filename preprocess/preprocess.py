@@ -356,9 +356,9 @@ def main_preprocess(opt, input_mode, save_mode, max_row):
         
     # save ground-truth
     gt_filename = os.path.join(opt.output_path, "%s.%s_candidate.json"%(opt.dataset_class, save_mode))
-    if opt.dataset_class == 'kp20k' and save_mode != 'train':
+    if (opt.dataset_class == 'kp20k' or opt.dataset_class == 'squad') and save_mode != 'train':
         save_ground_truths(feed_data, gt_filename, kp_key='keyphrases')
-        
+
     # openkp dev ground-truth keyphrases
     if opt.dataset_class == 'openkp' and save_mode == 'dev':
         save_ground_truths(source_data, gt_filename, kp_key='KeyPhrases')
