@@ -28,6 +28,8 @@ def add_preprocess_opts(parser):
                         help="The path to the source dataset (raw json).")
     parser.add_argument('--output_path', type=str, required=True,
                         help="The path to save preprocess data")
+    parser.add_argument('--max_row', type=int, required=True,
+                        help="Amount of row being processed")
     # ------------------------------------------------------------------
     # specific for kp20k
     parser.add_argument('-max_src_seq_length', type=int, default=300,
@@ -59,20 +61,24 @@ def set_logger(log_file):
 # -------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------
 # original dataset loader
-def openkp_loader(mode, source_dataset_dir):
+def openkp_loader(mode, source_dataset_dir, max_row):
     ''' load source OpenKP dataset :'url', 'VDOM', 'text', 'KeyPhrases' '''
     
     logger.info("start loading %s data ..." % mode)
     source_path = os.path.join(source_dataset_dir, 'OpenKP%s.jsonl' % mode)
     data_pairs = []
+    i = 0
     with codecs.open(source_path, "r", "utf-8") as corpus_file:
         for idx, line in enumerate(tqdm(corpus_file)):
             json_ = json.loads(line)
             data_pairs.append(json_)
+            i += 1
+            if (i == max_row):
+                break
     return data_pairs
 
 
-def kp20k_loader(mode, source_dataset_dir, 
+def kp20k_loader(mode, source_dataset_dir, max_row,
                  src_fields = ['title', 'abstract'], 
                  trg_fields = ['keyword'], trg_delimiter=';'):
     
@@ -83,6 +89,7 @@ def kp20k_loader(mode, source_dataset_dir,
     source_path = os.path.join(source_dataset_dir, 'kp20k_%s.json' % mode)
     
     data_pairs = []
+    i = 0
     with codecs.open(source_path, "r", "utf-8") as corpus_file:
         for idx, line in enumerate(tqdm(corpus_file)):
             json_ = json.loads(line)
@@ -91,6 +98,9 @@ def kp20k_loader(mode, source_dataset_dir,
             src_str = '.'.join([json_[f] for f in src_fields])
             [trg_strs.extend(re.split(trg_delimiter, json_[f])) for f in trg_fields]
             data_pairs.append((src_str, trg_strs))
+            i += 1
+            if (i == max_row):
+                break
     return data_pairs
 
 # -------------------------------------------------------------------------------------
@@ -306,10 +316,10 @@ def save_preprocess_data(data_list, filename):
 # -------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------
 # main function
-def main_preprocess(opt, input_mode, save_mode):
+def main_preprocess(opt, input_mode, save_mode, max_row):
     
     # load source dataset
-    source_data = data_loader[opt.dataset_class](input_mode, opt.source_dataset_dir)
+    source_data = data_loader[opt.dataset_class](input_mode, opt.source_dataset_dir, max_row)
     logger.info("success loaded %s %s data : %d " % (opt.dataset_class, input_mode, len(source_data)))
 
     # refactor source data
@@ -374,4 +384,4 @@ if __name__ == "__main__":
     # start preprocess ...
     mode_dir = dataset_dict[opt.dataset_class]
     for input_mode, save_mode in mode_dir:
-        main_preprocess(opt, input_mode, save_mode)
+        main_preprocess(opt, input_mode, save_mode, opt.max_row)
