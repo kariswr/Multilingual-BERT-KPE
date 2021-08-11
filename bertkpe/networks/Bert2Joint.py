@@ -254,7 +254,7 @@ class BertForChunkTFRanking(BertForCnnGramKernelRanking):
             # [2] Rank Loss
             Rank_Loss_Fct = MarginRankingLoss(margin=1, reduction='mean')
             
-            device = torch.device("cuda", total_scores.get_device())
+            device = device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             flag = torch.FloatTensor([1]).to(device)
             
             rank_losses = []            
