@@ -14,7 +14,8 @@ from tqdm import tqdm
 import prepro_utils
 
 dataset_dict = {'openkp':[('EvalPublic', 'eval'), ('Dev', 'dev'), ('Train', 'train')], 
-                'kp20k':[('testing', 'eval'), ('validation', 'dev'), ('training', 'train')]}
+                'kp20k':[('testing', 'eval'), ('validation', 'dev'), ('training', 'train')],
+                'squad':[('test', 'eval'), ('train', 'train')]}
 
 logger = logging.getLogger()
 # -------------------------------------------------------------------------------------
@@ -22,7 +23,7 @@ logger = logging.getLogger()
 # config param
 def add_preprocess_opts(parser):
     
-    parser.add_argument("--dataset_class", type=str, choices=['openkp', 'kp20k'],
+    parser.add_argument("--dataset_class", type=str, choices=['openkp', 'kp20k', 'squad'],
                        help="Select dataset to be preprocessed. ")
     parser.add_argument('--source_dataset_dir', type=str, required=True,
                         help="The path to the source dataset (raw json).")
@@ -93,10 +94,29 @@ def kp20k_loader(mode, source_dataset_dir, max_row,
     with codecs.open(source_path, "r", "utf-8") as corpus_file:
         for idx, line in enumerate(tqdm(corpus_file)):
             json_ = json.loads(line)
-            
             trg_strs = []
             src_str = '.'.join([json_[f] for f in src_fields])
             [trg_strs.extend(re.split(trg_delimiter, json_[f])) for f in trg_fields]
+            data_pairs.append((src_str, trg_strs))
+            i += 1
+            if (i == max_row):
+                break
+    return data_pairs
+
+def squad_loader(mode, source_dataset_dir, max_row,
+                 src_fields = ['title', 'abstract'], 
+                 trg_fields = ['keyword'], trg_delimiter=';'):
+    
+    logger.info("start loading %s data ..." % mode)
+    source_path = os.path.join(source_dataset_dir, '%s_reconstruct_for_bert_kpe.json' % mode)
+    data_pairs = []
+    i = 0
+    with codecs.open(source_path, "r", "utf-8") as corpus_file:
+        for idx, line in enumerate(tqdm(corpus_file)):
+            json_ = json.loads(line)
+            trg_strs = []
+            src_str = '.'.join([json_[f] for f in src_fields])
+            [trg_strs.extend(json_[f]) for f in trg_fields]
             data_pairs.append((src_str, trg_strs))
             i += 1
             if (i == max_row):
@@ -230,7 +250,7 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
 # -------------------------------------------------------------------------------------
 # filter absent keyphrases
 def filter_openkp_absent(examples):
-    logger.info('strat filter absent keyphrases ...')
+    logger.info('start filter absent keyphrases ...')
     data_list = []
     null_urls, absent_urls = [], []
     for idx, ex in enumerate(tqdm(examples)):
@@ -262,7 +282,7 @@ def filter_openkp_absent(examples):
 
 
 def filter_kp20k_absent(examples):
-    logger.info('strat filter absent keyphrases for KP20k...')
+    logger.info('start filter absent keyphrases for KP20k...')
     data_list = []
     
     null_ids, absent_ids = 0, 0
@@ -356,9 +376,9 @@ def main_preprocess(opt, input_mode, save_mode, max_row):
 if __name__ == "__main__":
     
     # preprocess selector
-    data_loader = {'openkp':openkp_loader, 'kp20k':kp20k_loader}
-    data_refactor = {'openkp':openkp_refactor, 'kp20k':kp20k_refactor}
-    absent_filter = {'openkp':filter_openkp_absent, 'kp20k':filter_kp20k_absent}
+    data_loader = {'openkp':openkp_loader, 'kp20k':kp20k_loader, 'squad':squad_loader}
+    data_refactor = {'openkp':openkp_refactor, 'kp20k':kp20k_refactor, 'squad':kp20k_refactor}
+    absent_filter = {'openkp':filter_openkp_absent, 'kp20k':filter_kp20k_absent, 'squad':filter_kp20k_absent}
 
     t0 = time.time()
     parser = argparse.ArgumentParser(description='preprocess_for_kpe.py',
