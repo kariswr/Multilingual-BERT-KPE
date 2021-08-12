@@ -19,7 +19,7 @@ def add_default_args(parser):
                        choices=['bert2span', 'bert2tag', 'bert2chunk', 'bert2rank', 'bert2joint'],
                        help='Select different model types.')
     modes.add_argument("--pretrain_model_type", type=str,
-                       choices=['bert-base-cased', 'spanbert-base-cased', 'roberta-base'],
+                       choices=['bert-base-cased', 'spanbert-base-cased', 'roberta-base', 'bert-base-multilingual-cased'],
                        help="Select pretrain model type.")
     # ---------------------------------------------------------------------------------------------
     # Filesystem
