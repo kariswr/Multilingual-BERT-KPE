@@ -15,7 +15,7 @@ import prepro_utils
 
 dataset_dict = {'openkp':[('EvalPublic', 'eval'), ('Dev', 'dev'), ('Train', 'train')], 
                 'kp20k':[('testing', 'eval'), ('validation', 'dev'), ('training', 'train')],
-                'squad':[('test', 'eval'), ('train', 'train')]}
+                'squad':[('test', 'eval'), ('val', 'dev'), ('train', 'train')]}
 
 logger = logging.getLogger()
 # -------------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ def add_preprocess_opts(parser):
                         help="The path to the source dataset (raw json).")
     parser.add_argument('--output_path', type=str, required=True,
                         help="The path to save preprocess data")
-    parser.add_argument('--max_row', type=int, required=True,
+    parser.add_argument('--max_row', type=int, required=False,
                         help="Amount of row being processed")
     # ------------------------------------------------------------------
     # specific for kp20k
@@ -340,7 +340,7 @@ def main_preprocess(opt, input_mode, save_mode, max_row):
     
     # load source dataset
     source_data = data_loader[opt.dataset_class](input_mode, opt.source_dataset_dir, max_row)
-    logger.info("success loaded %s %s data : %d " % (opt.dataset_class, input_mode, len(source_data)))
+    logger.info("success loaded %s %s data : %d " % (opt.dataset_class, input_mode, (len(source_data) if max_row == None else max_row)))
 
     # refactor source data
     refactor_data = data_refactor[opt.dataset_class](source_data, input_mode)
