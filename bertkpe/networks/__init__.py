@@ -1,31 +1,31 @@
 def get_class(args):
     
     # Bert2Span
-    if args.model_class == 'bert2span' and args.pretrain_model_type in ['bert-base-cased', 'spanbert-base-cased']:
+    if args.model_class == 'bert2span' and args.pretrain_model_type in ['bert-base-cased', 'spanbert-base-cased', 'bert-base-multilingual-cased']:
         return BertForAttSpanExtractor
     elif args.model_class == 'bert2span' and args.pretrain_model_type == 'roberta-base':
         return RobertaForAttSpanExtractor
     
     # Bert2Tag
-    elif args.model_class == 'bert2tag' and args.pretrain_model_type in ['bert-base-cased', 'spanbert-base-cased']:
+    elif args.model_class == 'bert2tag' and args.pretrain_model_type in ['bert-base-cased', 'spanbert-base-cased', 'bert-base-multilingual-cased']:
         return BertForSeqTagging
     elif args.model_class == 'bert2tag' and args.pretrain_model_type == 'roberta-base':
         return RobertaForSeqTagging
     
     # Bert2Chunk
-    elif args.model_class == 'bert2chunk' and args.pretrain_model_type in ['bert-base-cased', 'spanbert-base-cased']:
+    elif args.model_class == 'bert2chunk' and args.pretrain_model_type in ['bert-base-cased', 'spanbert-base-cased', 'bert-base-multilingual-cased']:
         return BertForCnnGramExtractor
     elif args.model_class == 'bert2chunk' and args.pretrain_model_type == 'roberta-base':
         return RobertaForCnnGramExtractor
     
     # Bert2Rank
-    elif args.model_class == 'bert2rank' and args.pretrain_model_type in ['bert-base-cased', 'spanbert-base-cased']:
+    elif args.model_class == 'bert2rank' and args.pretrain_model_type in ['bert-base-cased', 'spanbert-base-cased', 'bert-base-multilingual-cased']:
         return BertForTFRanking
     elif args.model_class == 'bert2rank' and args.pretrain_model_type == 'roberta-base':
         return RobertaForTFRanking
     
     # Bert2Joint
-    elif args.model_class == 'bert2joint' and args.pretrain_model_type in ['bert-base-cased', 'spanbert-base-cased']:
+    elif args.model_class == 'bert2joint' and args.pretrain_model_type in ['bert-base-cased', 'spanbert-base-cased', 'bert-base-multilingual-cased']:
         return BertForChunkTFRanking
     elif args.model_class == 'bert2joint' and args.pretrain_model_type == 'roberta-base':
         return RobertaForChunkTFRanking
