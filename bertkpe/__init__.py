@@ -25,8 +25,10 @@ from .constant import (PAD,
 
 tokenizer_class = {"bert-base-cased":BertTokenizer, 
                    "spanbert-base-cased":BertTokenizer,
-                   "roberta-base":RobertaTokenizer}
+                   "roberta-base":RobertaTokenizer,
+                   "bert-base-multilingual-cased":BertTokenizer}
 
 config_class = {"bert-base-cased":BertConfig, 
                 "spanbert-base-cased":BertConfig,  
-                "roberta-base":RobertaConfig}
+                "roberta-base":RobertaConfig,
+                "bert-base-multilingual-cased":BertConfig}
