@@ -13,7 +13,7 @@ DIGIT_WORD = 'DIGIT'
 Idx2Tag = ['O', 'B', 'I', 'E', 'U']
 Tag2Idx = {'O':0, 'B':1, 'I':2, 'E':3, 'U':4}
 
-Decode_Candidate_Number = {'openkp':5, 'kp20k':10}
+Decode_Candidate_Number = {'openkp':5, 'kp20k':10, 'squad':10}
 
 class IdxTag_Converter(object):
     ''' idx2tag : a tag list like ['O','B','I','E','U']
