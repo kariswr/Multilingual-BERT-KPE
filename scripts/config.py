@@ -13,7 +13,7 @@ def add_default_args(parser):
     modes = parser.add_argument_group('Modes')
     modes.add_argument('--run_mode', type=str, choices=['train', 'test'],
                        help='Select running mode. ')
-    modes.add_argument('--dataset_class', type=str, choices=['openkp', 'kp20k'],
+    modes.add_argument('--dataset_class', type=str, choices=['openkp', 'kp20k', 'squad'],
                        help='Select datasets.')
     modes.add_argument('--model_class', type=str, 
                        choices=['bert2span', 'bert2tag', 'bert2chunk', 'bert2rank', 'bert2joint'],
