@@ -128,8 +128,10 @@ def pred_saver(args, tot_predictions, filename):
 def select_eval_script(name):
     if name == 'openkp':
         return openkp_evaluate_script, "max_f1_score3"
-    elif name in ['kp20k', 'squad']:
+    elif name == 'openkp':
         return kp20k_evaluate_script, "max_f1_score5"
+    elif name == 'squad':
+        return squad_evaluate_script, "max_f1_score5"
     raise RuntimeError('Invalid retriever class: %s' % name)
     
 
@@ -168,6 +170,33 @@ def kp20k_evaluate_script(args, candidate, stats, mode, metric_name='max_f1_scor
     epoch_time = Timer()
     
     reference_filename = os.path.join(args.preprocess_folder, 'kp20k.%s_candidate.json' %mode) 
+    f1_scores, precision_scores, recall_scores = evaluate_kp20k(candidate, reference_filename)
+
+    for i in precision_scores:
+        logger.info("@{}".format(i))
+        logger.info("F1:{}".format(np.mean(f1_scores[i])))
+        logger.info("P:{}".format(np.mean(precision_scores[i])))
+        logger.info("R:{}".format(np.mean(recall_scores[i])))
+        
+    f1_score5 = np.mean(f1_scores[5])
+    if f1_score5 > stats[metric_name]:
+        logger.info("-"*60)
+        stats[metric_name] = f1_score5
+        logger.info('Update ! Update ! Update ! ||  Mode = %s || Max f1_score5 = %.4f (epoch = %d, local_rank = %d)' 
+                    %(mode, stats[metric_name], stats['epoch'], args.local_rank))
+        logger.info("-"*60)
+    logger.info("Local Rank = %d || End Evaluatng : Mode = %s || Epoch = %d (Time: %.2f (s)) " 
+                %(args.local_rank, mode, stats['epoch'], epoch_time.time()))
+    logger.info("*"*80)
+    return stats
+
+# Squad Evaluation Script
+def squad_evaluate_script(args, candidate, stats, mode, metric_name='max_f1_score5'):
+    logger.info("*"*80)
+    logger.info("Start Evaluatng : Mode = %s || Epoch = %d" % (mode, stats['epoch']))
+    epoch_time = Timer()
+    
+    reference_filename = os.path.join(args.preprocess_folder, 'squad.%s_candidate.json' %mode) 
     f1_scores, precision_scores, recall_scores = evaluate_kp20k(candidate, reference_filename)
 
     for i in precision_scores:
