@@ -128,7 +128,7 @@ def pred_saver(args, tot_predictions, filename):
 def select_eval_script(name):
     if name == 'openkp':
         return openkp_evaluate_script, "max_f1_score3"
-    elif name == 'kp20k':
+    elif name in ['kp20k', 'squad']:
         return kp20k_evaluate_script, "max_f1_score5"
     raise RuntimeError('Invalid retriever class: %s' % name)
     
