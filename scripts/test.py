@@ -168,6 +168,7 @@ def bert2rank_decoder(args, data_loader, dataset, model, test_input_refactor,
         tot_predictions.extend(batch_predictions)
     
     candidate = pred_arranger(tot_predictions)
+    logging.info('Candidate... %s \n' % candidate)
     return candidate
 
 # -------------------------------------------------------------------------------------------
