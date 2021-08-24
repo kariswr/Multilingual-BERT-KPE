@@ -158,7 +158,8 @@ def bert2rank_decoder(args, data_loader, dataset, model, test_input_refactor,
             continue
         
         logging.info('Batch... %s \n' % batch)
-        logging.info('inputs %s lengths... %s \n' % inputs, lengths)
+        logging.info('inputs... %s \n' % inputs)
+        logging.info('lengths... %s \n' % lengths)
         logging.info('logit_lists ... %s \n' % logit_lists)
             
         # decode logits to phrase per batch
