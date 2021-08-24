@@ -156,6 +156,10 @@ def bert2rank_decoder(args, data_loader, dataset, model, test_input_refactor,
         except:
             logging.error(str(traceback.format_exc()))
             continue
+        
+        logging.info('Batch... %s \n' % batch)
+        logging.info('inputs %s lengths... %s \n' % inputs, lengths)
+        logging.info('logit_lists ... %s \n' % logit_lists)
             
         # decode logits to phrase per batch
         params = {'examples': dataset.examples, 
