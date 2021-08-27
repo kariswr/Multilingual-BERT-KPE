@@ -156,12 +156,7 @@ def bert2rank_decoder(args, data_loader, dataset, model, test_input_refactor,
         except:
             logging.error(str(traceback.format_exc()))
             continue
-        
-        logging.info('Batch... %s \n' % batch)
-        logging.info('inputs... %s \n' % inputs)
-        logging.info('lengths... %s \n' % lengths)
-        logging.info('logit_lists ... %s \n' % logit_lists)
-            
+                    
         # decode logits to phrase per batch
         params = {'examples': dataset.examples, 
                   'logit_lists':logit_lists, 
@@ -173,7 +168,6 @@ def bert2rank_decoder(args, data_loader, dataset, model, test_input_refactor,
         tot_predictions.extend(batch_predictions)
     
     candidate = pred_arranger(tot_predictions)
-    logging.info('Candidate... %s \n' % candidate)
     return candidate
 
 # -------------------------------------------------------------------------------------------
