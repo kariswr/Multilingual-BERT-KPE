@@ -243,6 +243,7 @@ if __name__ == "__main__":
         # save checkpoint : when new metric score > previous metric score
         if args.save_checkpoint and (new_metric_score > prev_metric_score) and (args.local_rank == -1 or torch.distributed.get_rank() == 0):
             checkpoint_name = '{}.{}.{}.epoch_{}.checkpoint'.format(args.model_class, args.dataset_class, args.pretrain_model_type.split('-')[0], epoch)
+            logger.info("Saving checkpoint %s on %s for epoch %d under name %s..." %(args.model_class, args.dataset_class, epoch, checkpoint_name))
             model.save_checkpoint(os.path.join(args.checkpoint_folder, checkpoint_name), stats['epoch'])
         
         # eval evaluation
