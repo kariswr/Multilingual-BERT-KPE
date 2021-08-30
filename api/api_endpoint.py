@@ -1,14 +1,16 @@
 from flask import Flask
+from flask_cors import CORS, cross_origin
 from flask_restful import Resource, Api, reqparse
 from os.path import dirname
 import ast
 import sys
 import pandas as pd
 
-# sys.path.insert(1, dirname(dirname(sys.path[0])))
 from answer_extractor import ExtractAnswer
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 api = Api(app)
 
 api.add_resource(ExtractAnswer, '/extract-answer')

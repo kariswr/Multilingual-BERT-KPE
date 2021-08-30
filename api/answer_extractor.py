@@ -9,13 +9,10 @@ import argparse
 import torch
 
 import os
-# os.chdir(os.path.dirname(__file__))
 sys.path.append(os.path.dirname(sys.path[0]))
-print(os.getcwd())
 
 from scripts import config, utils
 from bertkpe import dataloader, tokenizer_class
-# sys.path.append("scripts")
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'scripts'))
 from scripts.model import KeyphraseSpanExtraction
 from scripts.test import select_decoder
