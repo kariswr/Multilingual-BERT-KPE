@@ -231,7 +231,7 @@ if __name__ == "__main__":
 
     # -------------------------------------------------------------------------------------------
     # build eval dataloader 
-    if args.dataset_class == 'kp20k':
+    if args.dataset_class == 'kp20k' or args.dataset_class == 'squad' :
         eval_dataset = dataloader.build_dataset(**{'args':args, 'tokenizer':tokenizer, 'mode':'eval'})
         eval_sampler = torch.utils.data.sampler.SequentialSampler(eval_dataset)
         eval_data_loader = torch.utils.data.DataLoader(
@@ -282,7 +282,7 @@ if __name__ == "__main__":
     test_candidates = [dev_candidate]
     
     # eval generator
-    if args.dataset_class == 'kp20k':
+    if args.dataset_class == 'kp20k' or args.dataset_class == 'squad':
         eval_candidate = candidate_decoder(args, eval_data_loader, eval_dataset, model, test_input_refactor, pred_arranger, 'eval')
         
         eval_stats = {'epoch': checkpoint_epoch, main_metric_name: 0}
