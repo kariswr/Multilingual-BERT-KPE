@@ -175,6 +175,7 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
 
     # ---------------------------------------------------------------------------------------
     return_pairs = []
+    deleted_idx = []
     for idx, (src, trgs) in enumerate(tqdm(src_trgs_pairs)):
         src_filter_flag = False
 
@@ -187,6 +188,7 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
             src_filter_flag = True
 
         if valid_check and src_filter_flag:
+            deleted_idx.append(idx)
             continue
 
         trgs_tokens = []
@@ -238,11 +240,13 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
 
         # ignore the examples that have zero valid targets, for training they are no helpful
         if valid_check and len(trgs_tokens) == 0:
+            deleted_idx.append(idx)
             continue
 
         return_pairs.append({'doc_words': src_tokens, 'keyphrases':trgs_tokens})
         # return_pairs.append((src_tokens, trgs_tokens))
-        
+    
+    logger.info('Deleted index ... %s'%deleted_idx)
     return return_pairs
 
 
@@ -289,11 +293,12 @@ def filter_kp20k_absent(examples):
     
     url = 0
     for idx, ex in enumerate(tqdm(examples)):
-        
+        deleted_idx = []
         lower_words = [t.lower() for t in ex['doc_words']]
         present_phrases = prepro_utils.find_stem_answer(word_list=lower_words, ans_list=ex['keyphrases'])
         if present_phrases is None:
             null_ids += 1
+            deleted_idx.append(idx)
             continue
         if len(present_phrases['keyphrases']) != len(ex['keyphrases']):
             absent_ids += 1
@@ -309,6 +314,7 @@ def filter_kp20k_absent(examples):
         
     logger.info('Null : number = {} '.format(null_ids))
     logger.info('Absent : number = {} '.format(absent_ids))
+    logger.info('Deleted idx .... %s'%deleted_idx)
     return data_list
 
 
