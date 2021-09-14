@@ -211,6 +211,7 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
             trg_tokens = tokenize_fn(trg)
 
             if len(puncts) > 0:
+                logger.info('Filtered by punctuantions... %s'%trg_tokens)
                 continue
                 # Find punctuations in keyword: %s' % trg
 
@@ -226,10 +227,10 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
             if len(trg_tokens) > 5:
                 trg_set = set(trg_tokens)
                 if len(trg_set) * 2 < len(trg_tokens):
-                    logger.info('Filtered by heuristic... %s'%trg_tokens)
                     filtered_by_heuristic_rule = True
 
             if valid_check and (trg_filter_flag or filtered_by_heuristic_rule):
+                logger.info('Filtered by heuristic... %s'%trg_tokens)
                 continue
                 # length of src/trg exceeds limit: len(src)=%d, len(trg)=%d
                 # if filtered_by_heuristic_rule:print('INVALID by heuristic_rule')
