@@ -176,6 +176,9 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
     # ---------------------------------------------------------------------------------------
     return_pairs = []
     deleted_idx = []
+    token_too_long = 0
+    no_target = 0
+    amount_diff = 0
     for idx, (src, trgs) in enumerate(tqdm(src_trgs_pairs)):
         src_filter_flag = False
 
@@ -188,6 +191,7 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
             src_filter_flag = True
 
         if valid_check and src_filter_flag:
+            token_too_long += 1
             deleted_idx.append(idx)
             continue
 
@@ -222,6 +226,7 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
             if len(trg_tokens) > 5:
                 trg_set = set(trg_tokens)
                 if len(trg_set) * 2 < len(trg_tokens):
+                    logger.info('Filtered by heuristic... %s'%trg_tokens)
                     filtered_by_heuristic_rule = True
 
             if valid_check and (trg_filter_flag or filtered_by_heuristic_rule):
@@ -237,15 +242,23 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
                 # print('Find dirty keyword of type \d\d[a-z]\d\d: %s' % trg)
 
             trgs_tokens.append(trg_tokens)
+        if (len(trgs_tokens) < len(trgs)):
+            amount_diff += 1
+            diff = len(trgs) - len(trgs_tokens)
+            logger.info('Filtered by heuristic... %s'%diff)
 
         # ignore the examples that have zero valid targets, for training they are no helpful
         if valid_check and len(trgs_tokens) == 0:
+            no_target += 1
             deleted_idx.append(idx)
             continue
 
         return_pairs.append({'doc_words': src_tokens, 'keyphrases':trgs_tokens})
         # return_pairs.append((src_tokens, trgs_tokens))
     
+    logger.info('Amount of data with deleted target... %s'%amount_diff)
+    logger.info('Deleted data by token exceeded max token... %s'%token_too_long)
+    logger.info('Deleted data by no target... %s'%no_target)
     logger.info('Deleted index ... %s'%deleted_idx)
     return return_pairs
 
