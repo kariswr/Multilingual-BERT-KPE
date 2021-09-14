@@ -238,14 +238,14 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
             # FILTER 5: filter keywords like primary 75v05;secondary 76m10;65n30
             if valid_check and (len(trg_tokens) > 0 and re.match(r'\d\d[a-zA-Z\-]\d\d', 
                                                                  trg_tokens[0].strip())) or (len(trg_tokens) > 1 and re.match(r'\d\d\w\d\d', trg_tokens[1].strip())):
+                logger.info('Filtered by dirty keyword... %s'%trg_tokens)                                                                 
                 continue
                 # print('Find dirty keyword of type \d\d[a-z]\d\d: %s' % trg)
 
             trgs_tokens.append(trg_tokens)
         if (len(trgs_tokens) < len(trgs)):
-            amount_diff += 1
             diff = len(trgs) - len(trgs_tokens)
-            logger.info('Filtered by heuristic... %s'%diff)
+            amount_diff += diff
 
         # ignore the examples that have zero valid targets, for training they are no helpful
         if valid_check and len(trgs_tokens) == 0:
