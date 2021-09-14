@@ -178,7 +178,11 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
     deleted_idx = []
     token_too_long = 0
     no_target = 0
-    amount_diff = 0
+    amount_diff_trg = 0
+    trg_token_out_range = 0
+    trg_punct = 0
+    trg_heuristic = 0
+    trg_symbol = 0
     for idx, (src, trgs) in enumerate(tqdm(src_trgs_pairs)):
         src_filter_flag = False
 
@@ -186,8 +190,10 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
 
         # FILTER 3.1: if length of src exceeds limit, discard
         if opt.max_src_seq_length and len(src_tokens) > opt.max_src_seq_length:
+            logger.info('Token src too long... %s'%len(src_tokens))
             src_filter_flag = True
         if opt.min_src_seq_length and len(src_tokens) < opt.min_src_seq_length:
+            logger.info('Token src too short... %s'%len(src_tokens))
             src_filter_flag = True
 
         if valid_check and src_filter_flag:
@@ -211,14 +217,19 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
             trg_tokens = tokenize_fn(trg)
 
             if len(puncts) > 0:
-                logger.info('Filtered by punctuantions... %s'%trg_tokens)
+                # logger.info('Filtered by punctuantions... %s'%trg_tokens)
+                trg_punct += 1
                 continue
                 # Find punctuations in keyword: %s' % trg
 
             # FILTER 3.2: if length of trg exceeds limit, discard
             if opt.max_trg_seq_length and len(trg_tokens) > opt.max_trg_seq_length:
+                # logger.info('Token trg too long... %s'%len(trg_tokens))
+                trg_token_out_range += 1
                 trg_filter_flag = True
             if opt.min_trg_seq_length and len(trg_tokens) < opt.min_trg_seq_length:
+                # logger.info('Token trg too long... %s'%len(trg_tokens))
+                trg_token_out_range += 1
                 trg_filter_flag = True
 
             filtered_by_heuristic_rule = False
@@ -227,10 +238,11 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
             if len(trg_tokens) > 5:
                 trg_set = set(trg_tokens)
                 if len(trg_set) * 2 < len(trg_tokens):
+                    # logger.info('Filtered by heuristic... %s'%trg_tokens)
+                    trg_heuristic += 1
                     filtered_by_heuristic_rule = True
 
             if valid_check and (trg_filter_flag or filtered_by_heuristic_rule):
-                logger.info('Filtered by heuristic... %s'%trg_tokens)
                 continue
                 # length of src/trg exceeds limit: len(src)=%d, len(trg)=%d
                 # if filtered_by_heuristic_rule:print('INVALID by heuristic_rule')
@@ -239,14 +251,15 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
             # FILTER 5: filter keywords like primary 75v05;secondary 76m10;65n30
             if valid_check and (len(trg_tokens) > 0 and re.match(r'\d\d[a-zA-Z\-]\d\d', 
                                                                  trg_tokens[0].strip())) or (len(trg_tokens) > 1 and re.match(r'\d\d\w\d\d', trg_tokens[1].strip())):
-                logger.info('Filtered by dirty keyword... %s'%trg_tokens)                                                                 
+                # logger.info('Filtered by dirty keyword... %s'%trg_tokens)                                                                 
+                trg_symbol += 1
                 continue
                 # print('Find dirty keyword of type \d\d[a-z]\d\d: %s' % trg)
 
             trgs_tokens.append(trg_tokens)
         if (len(trgs_tokens) < len(trgs)):
             diff = len(trgs) - len(trgs_tokens)
-            amount_diff += diff
+            amount_diff_trg += diff
 
         # ignore the examples that have zero valid targets, for training they are no helpful
         if valid_check and len(trgs_tokens) == 0:
@@ -257,7 +270,11 @@ def kp20k_refactor(src_trgs_pairs, mode, valid_check=True):
         return_pairs.append({'doc_words': src_tokens, 'keyphrases':trgs_tokens})
         # return_pairs.append((src_tokens, trgs_tokens))
     
-    logger.info('Amount of data with deleted target... %s'%amount_diff)
+    logger.info('Amount of data with deleted target... %s'%amount_diff_trg)
+    logger.info('Target token out of range... %s'%trg_token_out_range)
+    logger.info('Target with punct... %s'%trg_punct)
+    logger.info('Target with heuristic... %s'%trg_heuristic)
+    logger.info('Dirty target... %s'%trg_symbol)
     logger.info('Deleted data by token exceeded max token... %s'%token_too_long)
     logger.info('Deleted data by no target... %s'%no_target)
     logger.info('Deleted index ... %s'%deleted_idx)
