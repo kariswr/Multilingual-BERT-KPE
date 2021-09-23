@@ -13,8 +13,9 @@ To run the API, use python api/api_endpoint.py in the repository folder.
 The API will run at http://localhost:5001.\
 To Extract Answer send a post request to  http://127.0.0.1:5001/extract-answer with body as follows:
 
+```
 {
     "paragraph" : "Dummy paragraph"
 }
-
+```
 
