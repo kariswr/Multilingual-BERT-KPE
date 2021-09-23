@@ -6,6 +6,8 @@ To know more about overall system : https://github.com/kariswr/Knowledge-Self-Ev
 
 ## How to Use
 
+The example of preprocess training, and testing for squad dataset using Mutltilingual BERT Embedding model can be seen [here](https://github.com/kariswr/Multilingual-BERT-KPE/blob/master/notebook/Train%20Multilingual%20BERT-KPE%20All%20Epoch.ipynb)
+
 ### API
 
 To run the API, use python api/api_endpoint.py in the repository folder.
